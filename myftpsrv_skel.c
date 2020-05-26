@@ -188,6 +188,25 @@ void operate(int sd) {
  *         ./mysrv <SERVER_PORT>
  **/
 int main (int argc, char *argv[]) {
+int i, cont_puerto;
+
+if (argc != 2)
+ {
+	printf("Erorr\n");
+	return -1;
+ }
+ else{
+
+for (i=0; i <strlen(argv[1]);i++){
+      cont_puerto = argv[1][i]-48;
+      if (cont_puerto < 0 || cont_puerto > 9){
+       printf ("Puerto ingresado no válido\n");
+       exit(1);
+	}
+      }
+
+}
+
 
     // arguments checking
 

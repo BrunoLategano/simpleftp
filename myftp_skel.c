@@ -184,11 +184,33 @@ void operate(int sd) {
  *         ./myftp <SERVER_IP> <SERVER_PORT>
  **/
 int main (int argc, char *argv[]) {
-    int sd;
+    int sd, i, cont_ip, cont_puerto;
     struct sockaddr_in addr;
 
     // arguments checking
+ if (argc != 3)
+ {
+	printf("Erorr\n");
+	return -1;
+ }
+ else{
+  for (i=0; i <strlen(argv[1]);i++){
+       cont_ip = argv[1][i]-48;
+       if ((cont_ip < 0 || cont_ip > 9) && (cont_ip != -2)){
+       printf ("IP ingresada no válida\n");
+       exit(1);
 
+ }
+else{ 
+ for (i=0; i <strlen(argv[2]);i++){
+      cont_puerto = argv[2][i]-48;
+      if (cont_puerto < 0 || cont_puerto > 9){
+       printf ("Puerto ingresado no válido\n");
+       exit(1);
+	}
+      }
+}
+}}
     // create socket and check for errors
     
     // set socket data    
