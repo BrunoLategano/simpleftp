@@ -26,6 +26,7 @@ bool recv_msg(int sd, int code, char *text) {
 
     // receive the answer
 
+    recv_s =recv (sd, buffer, BUFSIZE,0);
 
     // error checking
     if (recv_s < 0) warn("error receiving data");
@@ -56,7 +57,8 @@ void send_msg(int sd, char *operation, char *param) {
         sprintf(buffer, "%s\r\n", operation);
 
     // send command and check for errors
-
+    if (send(sd, res, strlen (res)+1,0)<0)
+        warn ("Error\n");
 }
 
 /**
@@ -84,7 +86,7 @@ void authenticate(int sd) {
     input = read_input();
 
     // send the command to the server
-    
+
     // relese memory
     free(input);
 
@@ -184,40 +186,67 @@ void operate(int sd) {
  *         ./myftp <SERVER_IP> <SERVER_PORT>
  **/
 int main (int argc, char *argv[]) {
-    int sd, i, cont_ip, cont_puerto;
+    int sd;
     struct sockaddr_in addr;
 
     // arguments checking
- if (argc != 3)
- {
-	printf("Erorr\n");
-	return -1;
- }
- else{
-  for (i=0; i <strlen(argv[1]);i++){
-       cont_ip = argv[1][i]-48;
-       if ((cont_ip < 0 || cont_ip > 9) && (cont_ip != -2)){
-       printf ("IP ingresada no válida\n");
-       exit(1);
 
- }
-else{ 
- for (i=0; i <strlen(argv[2]);i++){
-      cont_puerto = argv[2][i]-48;
-      if (cont_puerto < 0 || cont_puerto > 9){
-       printf ("Puerto ingresado no válido\n");
+if(argc!=3){    //se comprueba si se recibe la cantidad de argumentos indicados
+       printf("Ingrese la direccion IP y puerto del servidor\n");
        exit(1);
-	}
-      }
-}
-}}
+    }
+    else{
+       for(i = 0; i < strlen(argv[1]);i++){    //se toma el primer argumento recibido y analiza caracter por caracter si es un numero o punto
+           cont_ip = argv[1][i]-48;    //resta 48 para convertir el caracter en numero
+           if((cont_ip < 0 || cont_ip >9) && (cont_ip != -2)){    //-2 es el resultado de restar 48 al codigo ascii del punto (.)
+              printf("IP ingresada no valida\n");
+                   exit(1);
+                   }
+       }
+    }
+    if{
+       for(i = 0; i < strlen(argv[2]);i++){    //se toma el primer argumento recibido y analiza caracter por caracter si es un numero o punto
+           cont_puerto = argv[2][i]-48;    //resta 48 para convertir el caracter en numero
+           if(cont_puerto < 0 || cont_puerto >9){
+              printf("Puerto ingresado no valida\n");
+                   exit(1);
+                   }
+       }
+    }
+
     // create socket and check for errors
-    
-    // set socket data    
+        sd = socket (AF_INET, SOCK_STREAM, 0);
+        if (sd < 0){
+            printf("Error\n");
+            return -1;
+        }
+    // set socket data
+
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr =
+    inet_addr(argv[1]);
+    addr.sin_port = htons(atoi(argv[2]));
+
 
     // connect and check for errors
 
+    if (connect (sd,(struct sockaddr*)&addr,sizeof(addr))<0){
+            printf("Error\n");
+            return -1;
+        }
     // if receive hello proceed with authenticate and operate if not warning
+
+
+    if (recv_msg(sd,220,NULL))
+    {
+    authenticate(sd);
+    operate(sd);
+
+    } else {
+        warn("Error\n"));
+        close(sd);
+        return 0;
+    }
 
     // close socket
 

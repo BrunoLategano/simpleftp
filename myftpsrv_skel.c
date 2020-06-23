@@ -94,7 +94,7 @@ bool send_ans(int sd, char *message, ...){
  **/
 
 void retr(int sd, char *file_path) {
-    FILE *file;    
+    FILE *file;
     int bread;
     long fsize;
     char buffer[BUFSIZE];
@@ -126,9 +126,47 @@ bool check_credentials(char *user, char *pass) {
 
     // make the credential string
 
+    //user:pass
+
+    strcpy(cred,user);
+    strcat(cred,":");
+    strcat(cred, pass);
+    strcat(cred, "\n");
+
     // check if ftpusers file it's present
 
+    file = fopen(path, "r");
+    if (file == NULL) {
+
+        printf("MSG_550",path);
+        exit (1);
+    }else{
+
+    len = sizeof (char)*(strlen(cred)+1);
+    line = (char*)(malloc(len));
+    while(!feof(file)){
+        fgets(line,len,file);
+        /*stcmp devuelve 0 si son iguales,
+        -1 si el primer valor es menor que el segundo y
+        1 si el primer  valor es mayor que el segundo
+        si strcmp(cred, line) es igual a 0, encontre una coincidencia
+        */
+        if (strcmp(cred,line)==0){
+
+            found=true;
+            break;
+        }
+
+        }
+
+        fclose(file);
+        free(line);
+        return found;
+    }
+
     // search for credential string
+
+
 
     // close file and release any pointes if necessary
 
@@ -188,32 +226,36 @@ void operate(int sd) {
  *         ./mysrv <SERVER_PORT>
  **/
 int main (int argc, char *argv[]) {
-int i, cont_puerto;
-
-if (argc != 2)
- {
-	printf("Erorr\n");
-	return -1;
- }
- else{
-
-for (i=0; i <strlen(argv[1]);i++){
-      cont_puerto = argv[1][i]-48;
-      if (cont_puerto < 0 || cont_puerto > 9){
-       printf ("Puerto ingresado no válido\n");
-       exit(1);
-	}
-      }
-
-}
-
 
     // arguments checking
+
+    if(argc!=2){    //se comprueba si se recibe la cantidad de argumentos indicados
+       printf("Ingrese la direccion IP y puerto del servidor\n");
+       exit(1);
+    }
+    else{
+       for(i = 0; i < strlen(argv[0]);i++){    //se toma el primer argumento recibido y analiza caracter por caracter si es un numero o punto
+           cont_ip = argv[0][i]-48;    //resta 48 para convertir el caracter en numero
+           if((cont_ip < 0 || cont_ip >9) && (cont_ip != -2)){    //-2 es el resultado de restar 48 al codigo ascii del punto (.)
+              printf("IP ingresada no valida\n");
+                   exit(1);
+                   }
+       }
+    }
+    if{
+       for(i = 0; i < strlen(argv[1]);i++){    //se toma el primer argumento recibido y analiza caracter por caracter si es un numero o punto
+           cont_puerto = argv[1][i]-48;    //resta 48 para convertir el caracter en numero
+           if(cont_puerto < 0 || cont_puerto >9){
+              printf("Puerto ingresado no valida\n");
+                   exit(1);
+                   }
+       }
+    }
 
     // reserve sockets and variables space
 
     // create server socket and check errors
-    
+
     // bind master socket and check errors
 
     // make it listen
